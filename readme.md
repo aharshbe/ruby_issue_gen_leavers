@@ -1,21 +1,23 @@
-# Issue Automation for leaving Hubbers
+# Offboarding automation for GitHub employees
 ## Purpose
-- Automate creating issue for when a GitHub employee leaves based on Workday notification
+- Automate the creation of a GitHub issue when a GitHub employee leaves
 
 ### Dependencies:
 * Ruby installed
+* Python 2.7+ installed
 * Gems:
 	- Ocotokit
-	- dotenv`
+	- dotenv
+* Permission/Auth for the Google account to automation received emails
+* Automation is kicked off via Workday notification sent to specified email `itautomation*`
 
 ### Usage:
-* Clone repo
-* In your terminal, cd into the repo
-* cd into repo
+* `git clone https://github.com/aharshbe/ruby_issue_gen_leavers`
+* `cd ruby_issue_gen_leavers`
+* `cd gmail_api/`
+* run app `./quickstart.rb`
 
 
 #### Authors:
-* [Travis Kopp](https://github.com/teakopp)
 * [Austin Harshberger](https://github.com/aharshbe)
-* [David Frazier](https://github.com/dayfrayz)
 

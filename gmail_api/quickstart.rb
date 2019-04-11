@@ -1,3 +1,6 @@
+#!/usr/bin/ruby
+
+# Requires for Google api
 require 'google/apis/gmail_v1'
 require 'googleauth'
 require 'googleauth/stores/file_token_store'
@@ -19,35 +22,6 @@ SCOPE = Google::Apis::GmailV1::AUTH_GMAIL_READONLY
 #
 # @return [Google::Auth::UserRefreshCredentials] OAuth2 credentials
 
-def loading
-  system('clear')
-  puts "Parsing snippets ."
-  sleep(0.01)
-  system('clear')
-  puts "Parsing snippets .."
-  sleep(0.01)
-  system('clear')
-  puts "Parsing snippets ..."
-  sleep(0.01)
-  system('clear')
-  puts "Parsing snippets ...."
-  sleep(0.01)
-  system('clear')
-  puts "Parsing snippets ....."
-  sleep(0.01)
-  system('clear')
-  puts "Parsing snippets ......"
-  sleep(0.01)
-  system('clear')
-  puts "Parsing snippets ......."
-  sleep(0.01)
-  system('clear')
-  puts "Parsing snippets .........."
-  sleep(0.01)
-  system('clear')
-  puts "Parsing snippets ............"
-  sleep(0.01)
-end
 def authorize
   client_id = Google::Auth::ClientId.from_file(CREDENTIALS_PATH)
   token_store = Google::Auth::Stores::FileTokenStore.new(file: TOKEN_PATH)
@@ -71,24 +45,63 @@ service = Google::Apis::GmailV1::GmailService.new
 service.client_options.application_name = APPLICATION_NAME
 service.authorization = authorize
 
-# Show the user's labels
+# user_id is user
 user_id = 'me'
-result_labels = service.list_user_labels(user_id)
-puts 'Labels:'
-puts 'No labels found' if result_labels.labels.empty?
-result_labels.labels.each { |label| puts "- #{label.name}" }
 
+# Check to make sure user messages exist
 result_messages = result_messages = service.list_user_messages(user_id)
-puts "Messages:"
 puts 'No messages found' if result_messages.messages.empty?
 arr_snippets = Array.new
+message_ids = Array.new
+
+# If messages exist, build array of messages
 result_messages.messages.each {
   |message|
+  puts "<--------------->"
   message_raw = message.raw
   get_message = service.get_user_message(user_id, message.id)
   arr_snippets.push(get_message.snippet)
-  puts get_message.snippet
+  message_ids.push(message.id)
 }
 system('clear')
 puts "Done parsing snippets from messages."
-puts arr_snippets
+
+# Search for messages that have a given string, in this case hubber
+s="Hubber"
+
+hubberNames = Array.new
+messagesToDelete = Array.new
+number_of_s_found = 0
+index = 0
+arr_snippets.each {
+  |snippet|
+  if snippet.include? s
+    number_of_s_found += 1
+    oString = snippet.partition(':').last
+    hubberName = oString.partition(':').first
+    hubberNames.push(hubberName)
+    messagesToDelete.push(index)
+  end
+  index += 1
+}
+
+puts "found, #{number_of_s_found} hubbers"
+system("ruby create_github_issue.rb #{hubberNames}")
+
+
+
+puts message_ids
+puts messagesToDelete
+current = 0
+email_index = 0
+message_ids.each {
+  |email|
+  if email_index == messagesToDelete[current]
+    puts "Delelting..."
+    system("python delete.py #{email}")
+    current += 1
+  else
+    puts "Kepping email #{email} at #{email_index}"
+  end
+  email_index += 1
+}
