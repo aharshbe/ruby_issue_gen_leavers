@@ -1,6 +1,6 @@
 .env
 .DS_STORE
-credentials.json
-token.pickle
-token.yaml
+./gmail_api/credentials.json
+./gmail_api/token.pickle
+./gmail_api/token.yaml
 
